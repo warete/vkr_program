@@ -1,3 +1,24 @@
+Vue.component("vue-plotly", {
+    props: ["data", "layout", "uid"],
+    template: '<div :ref="uid"></div>',
+    mounted() {
+        Plotly.plot(this.$refs[this.uid], this.data, this.layout, {displaylogo: false, responsive: true});
+    },
+    watch: {
+        data: {
+            handler: function () {
+                Plotly.react(
+                    this.$refs[this.uid],
+                    this.data,
+                    this.layout,
+                    {displaylogo: false}
+                );
+            },
+            deep: true
+        }
+    }
+});
+
 Vue.component('left-form', {
     props: ['methods'],
     data: function () {
