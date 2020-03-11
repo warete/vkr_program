@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
 import numpy as np
@@ -45,6 +45,22 @@ methods = {
 @app.route('/')
 def index():
     return render_template('index.html', debug=app.debug)
+
+
+@app.route('/predict/', methods=['POST'])
+def train():
+    post_data = request.get_json()
+    response = {
+        'status': 'error',
+    }
+    if methods[post_data.get('method')]:
+        yPred = methods[post_data.get('method')].predict(xTest)
+        accuracy = accuracy_score(yTest, yPred)
+        response['status'] = 'success'
+        response['metrics'] = {
+            'accuracy': accuracy
+        }
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(debug=app.debug)
