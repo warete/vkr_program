@@ -9,7 +9,52 @@
 </head>
 <body>
 <div id="app">
+    <b-container>
+        <b-row>
+            <b-col>
+                <left-form :methods="methods"></left-form>
+            </b-col>
+            <b-col>
+
+            </b-col>
+        </b-row>
+    </b-container>
 </div>
+
+<template id="template-left-form">
+    <div>
+        <b-row>
+            <b-col cols="12"><label>Файл с данными</label></b-col>
+            <b-col>
+                <b-input v-model="importFilePath"></b-input>
+            </b-col>
+            <b-col>
+                <b-button block>Выбрать csv-файл</b-button>
+            </b-col>
+        </b-row>
+        <b-row>
+            <b-col cols="6"><label>Процент тестовой выборки</label></b-col>
+            <b-col cols="6"><label>Метод</label></b-col>
+            <b-col>
+                <b-input-group append="%">
+                    <b-form-input v-model="testPercent"></b-form-input>
+                </b-input-group>
+            </b-col>
+            <b-col>
+                <b-form-select v-model="selectedMethod" :options="methodsForSelect"></b-form-select>
+            </b-col>
+        </b-row>
+        <b-row>
+            <b-col class="py-2">
+                <b-button variant="danger" @click="onTrainHandler" block>Обучить</b-button>
+            </b-col>
+            <b-col class="py-2">
+                <b-button variant="success" @click="onPredictHandler" block>Запустить</b-button>
+            </b-col>
+        </b-row>
+    </div>
+</template>
+
 {% if debug %}
     <script src="%% url_for('static', filename='js/vue.js') %%"></script>
 {% else %}
