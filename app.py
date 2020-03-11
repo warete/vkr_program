@@ -39,19 +39,33 @@ xTrain, xTest, yTrain, yTest = train_test_split(
 )
 
 methods = {
-    'svm': SVC(gamma='scale').fit(xTrain, yTrain),
-    'knn': neighbors.KNeighborsClassifier(5, weights='uniform').fit(xTrain, yTrain),
-    'bagging': BaggingClassifier(SVC(gamma='scale'), max_samples=0.5, max_features=0.5).fit(xTrain, yTrain),
-    'sgd': SGDClassifier().fit(xTrain, yTrain)
+    'svm': SVC(gamma='scale'),
+    'knn': neighbors.KNeighborsClassifier(5, weights='uniform'),
+    'bagging': BaggingClassifier(SVC(gamma='scale'), max_samples=0.5, max_features=0.5),
+    'sgd': SGDClassifier()
 }
 
 @app.route('/')
 def index():
     return render_template('index.html', debug=app.debug)
 
+@app.route('/train/', methods=['POST'])
+def train():
+    post_data = request.get_json()
+    response = {
+        'status': 'error',
+    }
+    if methods[post_data.get('method')]:
+        methods[post_data.get('method')] = methods[post_data.get('method')].fit(xTrain, yTrain)
+        response['status'] = 'success'
+        response['method'] = {
+            'code': post_data.get('method'),
+            'id': post_data.get('methodId')
+        }
+    return jsonify(response)
 
 @app.route('/predict/', methods=['POST'])
-def train():
+def predict():
     post_data = request.get_json()
     response = {
         'status': 'error',
