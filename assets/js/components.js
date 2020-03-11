@@ -64,17 +64,33 @@ var app = new Vue({
             testPercent: 75,
             methods: {
                 0: {
-                    name: 'svm'
+                    name: 'svm',
+                    code: 'svm'
                 },
                 1: {
-                    name: 'k-ближайших соседей'
+                    name: 'k-ближайших соседей',
+                    code: 'knn'
                 }
             },
             selectedMethod: 0,
-            apiBase: 'http://localhost:5000',
+            apiBase: 'http://127.0.0.1:5000',
             apiRoutes: {
                 trainData: '/train/',
                 predictData: '/predict/'
+            },
+            mainAccuracyData: {
+                data: [
+                    {
+                        values: [1, 0],
+                        type: 'pie',
+                        labels: ['Верно', 'Неверно'],
+                        showlegend: false,
+                        automargin: true
+                    }
+                ],
+                layout: {
+                    title: 'Точность "здоров/болен"'
+                }
             }
         }
     },
@@ -96,11 +112,23 @@ var app = new Vue({
         });
     },
     methods: {
+        sendRequest: function(endPoint, payload, callback) {
+            axios.post(this.apiBase + endPoint, payload)
+                .then(callback)
+                .catch((error) => {
+                    console.error(error);
+                });
+        },
         doTrain: function () {
             console.log('training start...');
         },
         doPredict: function () {
-            console.log('predicting start...');
+            const that = this;
+            this.sendRequest(this.apiRoutes.predictData, {method: this.methods[this.selectedMethod].code}, (res) => {
+                if (res.data.status == 'success') {
+                    this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
+                }
+            });
         }
     }
 });

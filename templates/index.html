@@ -9,13 +9,20 @@
 </head>
 <body>
 <div id="app">
-    <b-container>
+    <b-container fluid>
         <b-row>
-            <b-col>
+            <b-col cols="4">
                 <left-form :methods="methods"></left-form>
             </b-col>
-            <b-col>
+            <b-col cols="8">
+                <b-row>
+                    <b-col cols="6">
+                        <vue-plotly :data="mainAccuracyData.data" :layout="mainAccuracyData.layout" uid="mainAccuracyPie"/>
+                    </b-col>
+                    <b-col cols="6">
 
+                    </b-col>
+                </b-row>
             </b-col>
         </b-row>
     </b-container>
@@ -63,6 +70,7 @@
 <script src="%% url_for('static', filename='js/axios.min.js') %%"></script>
 <script src="%% url_for('static', filename='js/bootstrap-vue.min.js') %%"></script>
 <script src="%% url_for('static', filename='js/bootstrap-vue-icons.min.js') %%"></script>
+<script src="%% url_for('static', filename='js/plotly-latest.min.js') %%"></script>
 
 <script src="%% url_for('static', filename='js/components.js') %%"></script>
 </body>
