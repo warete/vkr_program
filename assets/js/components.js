@@ -70,6 +70,14 @@ var app = new Vue({
                 1: {
                     name: 'k-ближайших соседей',
                     code: 'knn'
+                },
+                2: {
+                    name: 'Bagging meta-estimator + SVM',
+                    code: 'bagging'
+                },
+                3: {
+                    name: 'Stochastic Gradient Descent',
+                    code: 'sgd'
                 }
             },
             selectedMethod: 0,

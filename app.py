@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
-import numpy as np
 import pandas as pd
 from sklearn.svm import SVC
 from sklearn import neighbors
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.ensemble import BaggingClassifier
+from sklearn.linear_model import SGDClassifier
 
 class CustomFlask(Flask):
     jinja_options = Flask.jinja_options.copy()
@@ -39,7 +40,9 @@ xTrain, xTest, yTrain, yTest = train_test_split(
 
 methods = {
     'svm': SVC(gamma='scale').fit(xTrain, yTrain),
-    'knn': neighbors.KNeighborsClassifier(5, weights='uniform').fit(xTrain, yTrain)
+    'knn': neighbors.KNeighborsClassifier(5, weights='uniform').fit(xTrain, yTrain),
+    'bagging': BaggingClassifier(SVC(gamma='scale'), max_samples=0.5, max_features=0.5).fit(xTrain, yTrain),
+    'sgd': SGDClassifier().fit(xTrain, yTrain)
 }
 
 @app.route('/')
