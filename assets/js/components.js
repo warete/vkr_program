@@ -65,19 +65,23 @@ var app = new Vue({
             methods: {
                 0: {
                     name: 'svm',
-                    code: 'svm'
+                    code: 'svm',
+                    canPredict: false
                 },
                 1: {
                     name: 'k-ближайших соседей',
-                    code: 'knn'
+                    code: 'knn',
+                    canPredict: false
                 },
                 2: {
                     name: 'Bagging meta-estimator + SVM',
-                    code: 'bagging'
+                    code: 'bagging',
+                    canPredict: false
                 },
                 3: {
                     name: 'Stochastic Gradient Descent',
-                    code: 'sgd'
+                    code: 'sgd',
+                    canPredict: false
                 }
             },
             selectedMethod: 0,
@@ -124,19 +128,55 @@ var app = new Vue({
             axios.post(this.apiBase + endPoint, payload)
                 .then(callback)
                 .catch((error) => {
-                    console.error(error);
+                    this.showToast(error, 'error');
                 });
         },
         doTrain: function () {
-            console.log('training start...');
-        },
-        doPredict: function () {
-            const that = this;
-            this.sendRequest(this.apiRoutes.predictData, {method: this.methods[this.selectedMethod].code}, (res) => {
+            this.sendRequest(this.apiRoutes.trainData, {method: this.methods[this.selectedMethod].code, methodId: this.selectedMethod}, (res) => {
                 if (res.data.status == 'success') {
-                    this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
+                    this.methods[res.data.method.id].canPredict = true;
+                    this.showToast('Обучение прошло успешно. Теперь можно запустить', 'success');
+                } else {
+                    this.showToast('Попробуйте позже', 'error');
                 }
             });
+        },
+        doPredict: function () {
+            if (this.methods[this.selectedMethod].canPredict) {
+                this.sendRequest(this.apiRoutes.predictData, {method: this.methods[this.selectedMethod].code}, (res) => {
+                    if (res.data.status == 'success') {
+                        this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
+                        this.showToast('Данные успешно получены', 'success');
+                    } else {
+                        this.showToast('Попробуйте позже', 'error');
+                    }
+                });
+            } else {
+                this.showToast('Нужно сначала обучить', 'warning');
+            }
+        },
+        showToast: function (message, type) {
+            const types = {
+                error: {
+                    title: 'Ошибка',
+                    variant: 'danger'
+                },
+                warning: {
+                    title: 'Предупреждение',
+                    variant: 'warning'
+                },
+                success: {
+                    title: 'Успешно',
+                    variant: 'success'
+                }
+            }
+            if (typeof types[type] != 'undefined') {
+                this.$bvToast.toast(message, {
+                    title: types[type].title,
+                    autoHideDelay: 5000,
+                    variant: types[type].variant
+                });
+            }
         }
     }
 });
