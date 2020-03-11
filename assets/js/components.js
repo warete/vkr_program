@@ -101,7 +101,9 @@ var app = new Vue({
                     }
                 ],
                 layout: {
-                    title: 'Точность "здоров/болен"'
+                    title: 'Точность "здоров/болен"',
+                    plot_bgcolor: '#F4F4F4',
+                    paper_bgcolor: '#F4F4F4'
                 }
             }
         }
