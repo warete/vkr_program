@@ -4,21 +4,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>ВКР</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-vue.min.css') }}">
+    <link rel="stylesheet" href="%% url_for('static', filename='css/bootstrap.min.css') %%">
+    <link rel="stylesheet" href="%% url_for('static', filename='css/bootstrap-vue.min.css') %%">
 </head>
 <body>
 <div id="app">
 </div>
 {% if debug %}
-    <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
+    <script src="%% url_for('static', filename='js/vue.js') %%"></script>
 {% else %}
-    <script src="{{ url_for('static', filename='js/vue.min.js') }}"></script>
+    <script src="%% url_for('static', filename='js/vue.min.js') %%"></script>
 {% endif %}
-<script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/bootstrap-vue.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/bootstrap-vue-icons.min.js') }}"></script>
+<script src="%% url_for('static', filename='js/axios.min.js') %%"></script>
+<script src="%% url_for('static', filename='js/bootstrap-vue.min.js') %%"></script>
+<script src="%% url_for('static', filename='js/bootstrap-vue-icons.min.js') %%"></script>
 
-<script src="{{ url_for('static', filename='js/components.js') }}"></script>
+<script src="%% url_for('static', filename='js/components.js') %%"></script>
 </body>
 </html>
