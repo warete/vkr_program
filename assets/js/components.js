@@ -85,10 +85,10 @@ var app = new Vue({
                 }
             },
             selectedMethod: 0,
-            apiBase: 'http://127.0.0.1:5000',
+            apiBase: window.appHost ? window.appHost : 'http://127.0.0.1:5000/',
             apiRoutes: {
-                trainData: '/train/',
-                predictData: '/predict/'
+                trainData: 'train/',
+                predictData: 'predict/'
             },
             mainAccuracyData: {
                 data: [

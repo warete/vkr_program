@@ -47,7 +47,8 @@ methods = {
 
 @app.route('/')
 def index():
-    return render_template('index.html', debug=app.debug)
+    return render_template('index.html', debug=app.debug, host=request.host_url)
+
 
 @app.route('/train/', methods=['POST'])
 def train():
