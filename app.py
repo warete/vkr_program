@@ -24,16 +24,14 @@ app.config.from_object(__name__)
 app.config['DEBUG'] = True
 app.config['DATA_DIR'] = 'data/'
 
-VkrInstance = Vkr()
-VkrInstance.set_data_dir(dir = app.config['DATA_DIR'])
-
 # enable CORS
 CORS(app)
 
-xTrain, xTest, yTrain, yTest = VkrInstance.get_train_test_data(app.config['DATA_DIR'] + 'data.csv', 0.25)
-
-VkrInstance.xTrain, VkrInstance.yTrain = xTrain, yTrain
-
+# Vkr instance
+VkrInstance = Vkr()
+VkrInstance.set_data_dir(dir=app.config['DATA_DIR'])
+VkrInstance.data_file = 'data.csv'
+VkrInstance.xTrain, VkrInstance.xTest, VkrInstance.yTrain, VkrInstance.yTest = VkrInstance.get_train_test_data(0.25)
 VkrInstance.set_methods({
     'svm': SVC(gamma='scale'),
     'knn': neighbors.KNeighborsClassifier(5, weights='uniform'),
@@ -54,7 +52,7 @@ def train():
         'status': 'error',
     }
     if post_data.get('method') in VkrInstance.methods:
-        clf = VkrInstance.get_fitted_model(post_data.get('method'), True)
+        clf = VkrInstance.get_fitted_model(post_data.get('method'), post_data.get('testPercent'), True)
         response['status'] = 'success'
         response['method'] = {
             'code': post_data.get('method'),
@@ -75,9 +73,9 @@ def predict():
             response['status'] = 'warning'
             response['message'] = 'Нужно сначала обучить'
         else:
-            clf = VkrInstance.get_fitted_model(post_data.get('method'))
-            yPred = clf.predict(xTest)
-            accuracy = accuracy_score(yTest, yPred)
+            clf = VkrInstance.get_fitted_model(post_data.get('method'), post_data.get('testPercent'))
+            yPred = clf.predict(VkrInstance.xTest)
+            accuracy = accuracy_score(VkrInstance.yTest, yPred)
             response['status'] = 'success'
             response['metrics'] = {
                 'accuracy': accuracy

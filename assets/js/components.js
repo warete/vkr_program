@@ -24,7 +24,7 @@ Vue.component('left-form', {
     data: function () {
         return {
             importFilePath: '',
-            testPercent: 75,
+            testPercent: 25,
             selectedMethod: 0
         }
     },
@@ -61,7 +61,7 @@ var app = new Vue({
     data: function() {
         return {
             importFilePath: '',
-            testPercent: 75,
+            testPercent: 25,
             methods: {
                 0: {
                     name: 'svm',
@@ -134,27 +134,40 @@ var app = new Vue({
                 });
         },
         doTrain: function () {
-            this.sendRequest(this.apiRoutes.trainData, {method: this.methods[this.selectedMethod].code, methodId: this.selectedMethod}, (res) => {
-                if (res.data.status == 'success') {
-                    this.methods[res.data.method.id].canPredict = true;
-                    this.showToast('Обучение прошло успешно. Теперь можно запустить', 'success');
-                } else {
-                    this.showToast('Попробуйте позже', 'error');
-                }
-            });
-        },
-        doPredict: function () {
-            if (this.methods[this.selectedMethod].canPredict) {
-                this.sendRequest(this.apiRoutes.predictData, {method: this.methods[this.selectedMethod].code}, (res) => {
+            this.sendRequest(
+                this.apiRoutes.trainData,
+                {
+                    method: this.methods[this.selectedMethod].code,
+                    methodId: this.selectedMethod,
+                    testPercent: this.testPercent
+                },
+                (res) => {
                     if (res.data.status == 'success') {
-                        this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
-                        this.showToast('Данные успешно получены', 'success');
-                    } else if(res.data.status == 'warning') {
-                        this.showToast(res.data.message, 'warning');
+                        this.methods[res.data.method.id].canPredict = true;
+                        this.showToast('Обучение прошло успешно. Теперь можно запустить', 'success');
                     } else {
                         this.showToast('Попробуйте позже', 'error');
                     }
                 });
+        },
+        doPredict: function () {
+            if (this.methods[this.selectedMethod].canPredict) {
+                this.sendRequest(
+                    this.apiRoutes.predictData,
+                    {
+                        method: this.methods[this.selectedMethod].code,
+                        testPercent: this.testPercent
+                    },
+                    (res) => {
+                        if (res.data.status == 'success') {
+                            this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
+                            this.showToast('Данные успешно получены', 'success');
+                        } else if (res.data.status == 'warning') {
+                            this.showToast(res.data.message, 'warning');
+                        } else {
+                            this.showToast('Попробуйте позже', 'error');
+                        }
+                    });
             } else {
                 this.showToast('Нужно сначала обучить', 'warning');
             }
