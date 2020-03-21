@@ -56,6 +56,39 @@ Vue.component('left-form', {
     }
 });
 
+Vue.component('recipient-form', {
+    data: function () {
+        return {
+            rt: [],
+            ik: [],
+            result: ''
+        }
+    },
+    watch: {
+        rt: function (newVal) {
+            this.$root.$emit('rt_changed', newVal);
+        },
+        ik: function (newVal) {
+            this.$root.$emit('ik_changed', newVal);
+        },
+    },
+    template: '#template-recipient-form',
+    created: function() {
+        for (let i = 0; i < 9; i++) {
+            this.rt.push('');
+            this.ik.push('');
+        }
+    },
+    methods: {
+        onTrainHandler: function() {
+            this.$root.$emit('do_train');
+        },
+        onPredictHandler: function() {
+            this.$root.$emit('do_predict');
+        }
+    }
+});
+
 var app = new Vue({
     el: '#app',
     data: function() {
