@@ -66,22 +66,38 @@ var app = new Vue({
                 0: {
                     name: 'svm',
                     code: 'svm',
-                    canPredict: true
+                    canPredict: true,
+                    metrics: {
+                        sensitivity: 0,
+                        specificity: 0
+                    }
                 },
                 1: {
                     name: 'k-ближайших соседей',
                     code: 'knn',
-                    canPredict: true
+                    canPredict: true,
+                    metrics: {
+                        sensitivity: 0,
+                        specificity: 0
+                    }
                 },
                 2: {
                     name: 'Bagging meta-estimator + SVM',
                     code: 'bagging',
-                    canPredict: true
+                    canPredict: true,
+                    metrics: {
+                        sensitivity: 0,
+                        specificity: 0
+                    }
                 },
                 3: {
                     name: 'Stochastic Gradient Descent',
                     code: 'sgd',
-                    canPredict: true
+                    canPredict: true,
+                    metrics: {
+                        sensitivity: 0,
+                        specificity: 0
+                    }
                 }
             },
             selectedMethod: 0,
@@ -106,6 +122,14 @@ var app = new Vue({
                     paper_bgcolor: '#F4F4F4'
                 }
             }
+        }
+    },
+    computed: {
+        sensitivity: function () {
+            return typeof this.methods[this.selectedMethod].metrics.sensitivity != 'undefined' ? this.methods[this.selectedMethod].metrics.sensitivity : 0;
+        },
+        specificity: function () {
+            return typeof this.methods[this.selectedMethod].metrics.specificity != 'undefined' ? this.methods[this.selectedMethod].metrics.specificity : 0;
         }
     },
     created: function () {
@@ -161,6 +185,12 @@ var app = new Vue({
                     (res) => {
                         if (res.data.status == 'success') {
                             this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
+                            if (typeof res.data.metrics.sensitivity != undefined) {
+                                this.methods[this.selectedMethod].metrics['sensitivity'] = res.data.metrics.sensitivity;
+                            }
+                            if (typeof res.data.metrics.specificity != undefined) {
+                                this.methods[this.selectedMethod].metrics['specificity'] = res.data.metrics.specificity;
+                            }
                             this.showToast('Данные успешно получены', 'success');
                         } else if (res.data.status == 'warning') {
                             this.showToast(res.data.message, 'warning');
@@ -186,7 +216,7 @@ var app = new Vue({
                     title: 'Успешно',
                     variant: 'success'
                 }
-            }
+            };
             if (typeof types[type] != 'undefined') {
                 this.$bvToast.toast(message, {
                     title: types[type].title,

@@ -78,9 +78,15 @@ def predict():
             accuracy = accuracy_score(VkrInstance.yTest, yPred)
             response['status'] = 'success'
             response['metrics'] = {
-                'accuracy': accuracy
+                'accuracy': accuracy,
+                'sensitivity': VkrInstance.calculate_sensitivity(yPred),
+                'specificity': VkrInstance.calculate_specificity(yPred),
             }
     return jsonify(response)
+
+@app.route('/test/')
+def test():
+    VkrInstance.calculate_sensitivity([])
 
 
 if __name__ == '__main__':
