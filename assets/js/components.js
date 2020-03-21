@@ -66,22 +66,22 @@ var app = new Vue({
                 0: {
                     name: 'svm',
                     code: 'svm',
-                    canPredict: false
+                    canPredict: true
                 },
                 1: {
                     name: 'k-ближайших соседей',
                     code: 'knn',
-                    canPredict: false
+                    canPredict: true
                 },
                 2: {
                     name: 'Bagging meta-estimator + SVM',
                     code: 'bagging',
-                    canPredict: false
+                    canPredict: true
                 },
                 3: {
                     name: 'Stochastic Gradient Descent',
                     code: 'sgd',
-                    canPredict: false
+                    canPredict: true
                 }
             },
             selectedMethod: 0,
@@ -149,6 +149,8 @@ var app = new Vue({
                     if (res.data.status == 'success') {
                         this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
                         this.showToast('Данные успешно получены', 'success');
+                    } else if(res.data.status == 'warning') {
+                        this.showToast(res.data.message, 'warning');
                     } else {
                         this.showToast('Попробуйте позже', 'error');
                     }
