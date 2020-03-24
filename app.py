@@ -124,7 +124,19 @@ def diagnose():
 
 @app.route('/test/')
 def test():
-    VkrInstance.calculate_sensitivity([])
+    from sklearn.model_selection import train_test_split
+    from sklearn.model_selection import GridSearchCV
+    data = VkrInstance.data[VkrInstance.data.position != 10]
+    xTrain, xTest, yTrain, yTest = train_test_split(
+            data[VkrInstance.temp_columns],
+            data.position,
+            test_size=0.25,
+            random_state=0
+        )
+    yPred = SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)
+    print(yPred)
+    print(accuracy_score(yTest, yPred))
+    return ''
 
 
 if __name__ == '__main__':
