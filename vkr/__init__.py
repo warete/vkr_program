@@ -8,6 +8,8 @@ class Vkr:
     data_dir = 'data/'
     data_file = 'data.cv'
     data = pd.DataFrame()
+    temp_columns = ['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
+                  '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик']
 
     methods = {}
 
@@ -26,8 +28,7 @@ class Vkr:
                                   '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик', 'target', 'position'])
 
         return train_test_split(
-            self.data[['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
-                  '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик']],
+            self.data[self.temp_columns],
             self.data.target,
             test_size=test_sizе,
             random_state=0
@@ -66,7 +67,6 @@ class Vkr:
 
     def get_tumor_freq(self):
         withoutLast = self.data[self.data['position'] != 10]
-        print(withoutLast[withoutLast['target'] == 1])
         return {
             'x': ['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм'], 
             'y': withoutLast[withoutLast['target'] == 1]['position'].value_counts().to_dict()

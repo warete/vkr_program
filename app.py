@@ -84,6 +84,7 @@ def predict():
             }
     return jsonify(response)
 
+
 @app.route('/static_metrics/', methods=['POST'])
 def static_metrics():
     response = {
@@ -93,6 +94,32 @@ def static_metrics():
             'frequencyTumor': VkrInstance.get_tumor_freq()
         }
     }
+    return jsonify(response)
+
+
+@app.route('/diagnose/', methods=['POST'])
+def diagnose():
+    post_data = request.get_json()
+    response = {
+        'status': 'error',
+    }
+
+    if post_data.get('method') in VkrInstance.methods:
+        if VkrInstance.need_fit_model(post_data.get('method')):
+            response['status'] = 'warning'
+            response['message'] = 'Нужно сначала обучить'
+        else:
+            clf = VkrInstance.get_fitted_model(post_data.get('method'), post_data.get('testPercent'))
+            xPredict = []
+            for i in post_data.get('patientData')['rt']:
+                xPredict.append(i)
+            for i in post_data.get('patientData')['rt']:
+                xPredict.append(i)
+            yPred = clf.predict([xPredict])
+            response['status'] = 'success'
+            response['result'] = {
+                'class': str(yPred[0])
+            }
     return jsonify(response)
 
 @app.route('/test/')

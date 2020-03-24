@@ -20,7 +20,7 @@ Vue.component("vue-plotly", {
 });
 
 Vue.component('left-form', {
-    props: ['methods'],
+    props: ['methods', 'patientResult'],
     data: function () {
         return {
             importFilePath: '',
@@ -57,11 +57,16 @@ Vue.component('left-form', {
 });
 
 Vue.component('recipient-form', {
+    props: ['patientResult'],
     data: function () {
         return {
             rt: [],
-            ik: [],
-            result: ''
+            ik: []
+        }
+    },
+    computed: {
+        patientResultFull: function() {
+            return this.patientResult.class ? this.patientResult.class : '';
         }
     },
     watch: {
@@ -80,11 +85,17 @@ Vue.component('recipient-form', {
         }
     },
     methods: {
-        onTrainHandler: function() {
-            this.$root.$emit('do_train');
-        },
-        onPredictHandler: function() {
-            this.$root.$emit('do_predict');
+        onDiagnoseHandler: function() {
+            const empty_rt = this.rt.filter(item => item.length == 0);
+            const empty_ik = this.ik.filter(item => item.length == 0);
+            if (empty_ik.length || empty_rt.length) {
+                this.$root.$emit('show_toast', 'Не все данные пациента заполнены', 'error');
+            } else {
+                this.$root.$emit('do_diagnose', {
+                    rt: this.rt,
+                    ik: this.ik
+                });
+            }
         }
     }
 });
@@ -142,7 +153,8 @@ var app = new Vue({
             apiRoutes: {
                 trainData: 'train/',
                 predictData: 'predict/',
-                staticMetrics: 'static_metrics/'
+                staticMetrics: 'static_metrics/',
+                diagnose: 'diagnose/',
             },
             frequencyTemperature: {
                 data: [],
@@ -175,6 +187,10 @@ var app = new Vue({
                     plot_bgcolor: '#F4F4F4',
                     paper_bgcolor: '#F4F4F4'
                 }
+            },
+            patientResult: {
+                class: null,
+                point: null
             }
         }
     },
@@ -207,6 +223,12 @@ var app = new Vue({
         });
         this.$on('do_predict', function () {
             this.doPredict();
+        });
+        this.$on('do_diagnose', function (data) {
+            this.doDiagnose(data);
+        });
+        this.$on('show_toast', function (message, type) {
+            this.showToast(message, type);
         });
     },
     mounted: function () {
@@ -264,7 +286,8 @@ var app = new Vue({
                     } else {
                         this.showToast('Попробуйте позже', 'error');
                     }
-                });
+                }
+            );
         },
         doPredict: function () {
             if (this.methods[this.selectedMethod].canPredict) {
@@ -289,10 +312,31 @@ var app = new Vue({
                         } else {
                             this.showToast('Попробуйте позже', 'error');
                         }
-                    });
+                    }
+                );
             } else {
                 this.showToast('Нужно сначала обучить', 'warning');
             }
+        },
+        doDiagnose: function (data) {
+            this.sendRequest(
+                this.apiRoutes.diagnose,
+                {
+                    method: this.methods[this.selectedMethod].code,
+                    patientData: data,
+                    testPercent: this.testPercent
+                },
+                (res) => {
+                    if (res.data.status == 'success') {
+                        this.patientResult.class = res.data.result.class;                     
+                        this.showToast((this.patientResult.class == 1 ? 'Болен' : 'Здоров'), 'success');
+                    } else if (res.data.status == 'warning') {
+                        this.showToast(res.data.message, 'warning');
+                    } else {
+                        this.showToast('Попробуйте позже', 'error');
+                    }
+                }
+            );
         },
         showToast: function (message, type) {
             const types = {

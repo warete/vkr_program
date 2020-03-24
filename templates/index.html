@@ -108,10 +108,10 @@
         </b-row>
         <b-row class="pt-2">
             <b-col>
-                <b-button variant="danger" block>Диагностировать</b-button>
+                <b-button variant="danger" @click="onDiagnoseHandler" block>Диагностировать</b-button>
             </b-col>
             <b-col>
-                <b-input v-model="result" placeholder="Результат" readonly></b-input>
+                <b-input placeholder="Результат" readonly></b-input>
             </b-col>
         </b-row>
     </div>
