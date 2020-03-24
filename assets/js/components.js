@@ -152,6 +152,14 @@ var app = new Vue({
                     paper_bgcolor: '#F4F4F4'
                 }
             },
+            frequencyTumor: {
+                data: [],
+                layout: {
+                    title: 'Частотное распределение опухолей по точкам',
+                    plot_bgcolor: '#F4F4F4',
+                    paper_bgcolor: '#F4F4F4'
+                }
+            },
             mainAccuracy: {
                 data: [
                     {
@@ -218,6 +226,14 @@ var app = new Vue({
                             });
                         }
                         this.frequencyTemperature.data = freqData;
+                    }
+                    if (typeof res.data.metrics.frequencyTumor != undefined) {                        
+                        this.frequencyTumor.data = [{
+                            x: Object.values(res.data.metrics.frequencyTumor.x), 
+                            y: Object.values(res.data.metrics.frequencyTumor.y),
+                            type: 'bar',
+                            automargin: true
+                        }];
                     }
                 } else {
                     this.showToast('Произошла ошибка во время получения статистических данных', 'error');

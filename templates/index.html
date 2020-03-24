@@ -37,7 +37,7 @@
                 </b-row>
                 <b-row>
                     <b-col cols="6">
-                        
+                        <vue-plotly :data="frequencyTumor.data" :layout="frequencyTumor.layout" uid="frequencyTumorHistogram" class="plot"/>
                     </b-col>
                     <b-col cols="6">
                         <vue-plotly :data="frequencyTemperature.data" :layout="frequencyTemperature.layout" uid="frequencyTemperatureBox" class="plot"/>

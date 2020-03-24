@@ -63,3 +63,11 @@ class Vkr:
 
     def get_temp_freq(self):
         return self.data[['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм']].to_dict()
+
+    def get_tumor_freq(self):
+        withoutLast = self.data[self.data['position'] != 10]
+        print(withoutLast[withoutLast['target'] == 1])
+        return {
+            'x': ['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм'], 
+            'y': withoutLast[withoutLast['target'] == 1]['position'].value_counts().to_dict()
+        }

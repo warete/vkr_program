@@ -89,7 +89,8 @@ def static_metrics():
     response = {
         'status' : 'success',
         'metrics': {
-            'frequencyTemperature': VkrInstance.get_temp_freq()
+            'frequencyTemperature': VkrInstance.get_temp_freq(),
+            'frequencyTumor': VkrInstance.get_tumor_freq()
         }
     }
     return jsonify(response)
