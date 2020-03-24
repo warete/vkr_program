@@ -10,6 +10,9 @@
         body{
             background-color: #F4F4F4;
         }
+        .plot{
+            max-height: 400px;
+        }
     </style>
 </head>
 <body>
@@ -26,7 +29,7 @@
                 </b-row>
                 <b-row>
                     <b-col cols="6">
-                        <vue-plotly :data="mainAccuracyData" :layout="mainAccuracy.layout" uid="mainAccuracyPie"/>
+                        <vue-plotly :data="mainAccuracyData" :layout="mainAccuracy.layout" uid="mainAccuracyPie" class="plot"/>
                     </b-col>
                     <b-col cols="6">
 
@@ -34,10 +37,10 @@
                 </b-row>
                 <b-row>
                     <b-col cols="6">
-                        <vue-plotly :data="frequencyTemperature.data" :layout="frequencyTemperature.layout" uid="frequencyTemperatureBox"/>
+                        
                     </b-col>
                     <b-col cols="6">
-
+                        <vue-plotly :data="frequencyTemperature.data" :layout="frequencyTemperature.layout" uid="frequencyTemperatureBox" class="plot"/>
                     </b-col>
                 </b-row>
             </b-col>
