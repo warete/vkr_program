@@ -80,9 +80,18 @@ def predict():
             response['metrics'] = {
                 'accuracy': accuracy,
                 'sensitivity': VkrInstance.calculate_sensitivity(yPred),
-                'specificity': VkrInstance.calculate_specificity(yPred),
-                'frequencyTemperature': VkrInstance.data[['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм']].to_dict()
+                'specificity': VkrInstance.calculate_specificity(yPred)
             }
+    return jsonify(response)
+
+@app.route('/static_metrics/', methods=['POST'])
+def static_metrics():
+    response = {
+        'status' : 'success',
+        'metrics': {
+            'frequencyTemperature': VkrInstance.get_temp_freq()
+        }
+    }
     return jsonify(response)
 
 @app.route('/test/')

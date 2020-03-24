@@ -60,3 +60,6 @@ class Vkr:
         healthy_test_cnt = len(self.yTest[self.yTest == 0])
         healthy_pred_cnt = len(yPred[yPred == 0])
         return healthy_pred_cnt / healthy_test_cnt
+
+    def get_temp_freq(self):
+        return self.data[['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм']].to_dict()

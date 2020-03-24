@@ -141,12 +141,13 @@ var app = new Vue({
             apiBase: window.appHost ? window.appHost : 'http://127.0.0.1:5000/',
             apiRoutes: {
                 trainData: 'train/',
-                predictData: 'predict/'
+                predictData: 'predict/',
+                staticMetrics: 'static_metrics/'
             },
             frequencyTemperature: {
                 data: [],
                 layout: {
-                    title: 'Точность "здоров/болен"',
+                    title: 'Распределение температуры по точкам',
                     plot_bgcolor: '#F4F4F4',
                     paper_bgcolor: '#F4F4F4'
                 }
@@ -200,6 +201,30 @@ var app = new Vue({
             this.doPredict();
         });
     },
+    mounted: function () {
+        this.sendRequest(
+            this.apiRoutes.staticMetrics,
+            {},
+            (res) => {
+                if (res.data.status == 'success') {
+                    if (typeof res.data.metrics.frequencyTemperature != undefined) {
+                        const freqData = [];
+                        for (let i in res.data.metrics.frequencyTemperature) {
+                            freqData.push({
+                                y: Object.values(res.data.metrics.frequencyTemperature[i]), 
+                                type: 'box',
+                                name: i,
+                                automargin: true
+                            });
+                        }
+                        this.frequencyTemperature.data = freqData;
+                    }
+                } else {
+                    this.showToast('Произошла ошибка во время получения статистических данных', 'error');
+                }
+            }
+        );
+    },
     methods: {
         sendRequest: function(endPoint, payload, callback) {
             axios.post(this.apiBase + endPoint, payload)
@@ -241,18 +266,7 @@ var app = new Vue({
                             }
                             if (typeof res.data.metrics.specificity != undefined) {
                                 this.methods[this.selectedMethod].metrics['specificity'] = res.data.metrics.specificity;
-                            }
-                            if (typeof res.data.metrics.frequencyTemperature != undefined) {
-                                const freqData = [];
-                                for (let i in res.data.metrics.frequencyTemperature) {
-                                    freqData.push({
-                                        y: Object.values(res.data.metrics.frequencyTemperature[i]), 
-                                        type: 'box',
-                                        name: i
-                                    });
-                                }
-                                this.frequencyTemperature.data = freqData;
-                            }
+                            }                            
                             this.showToast('Данные успешно получены', 'success');
                         } else if (res.data.status == 'warning') {
                             this.showToast(res.data.message, 'warning');
