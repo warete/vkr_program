@@ -102,7 +102,8 @@ var app = new Vue({
                     canPredict: true,
                     metrics: {
                         sensitivity: 0,
-                        specificity: 0
+                        specificity: 0,
+                        accuracy: []
                     }
                 },
                 1: {
@@ -111,7 +112,8 @@ var app = new Vue({
                     canPredict: true,
                     metrics: {
                         sensitivity: 0,
-                        specificity: 0
+                        specificity: 0,
+                        accuracy: []
                     }
                 },
                 2: {
@@ -120,7 +122,8 @@ var app = new Vue({
                     canPredict: true,
                     metrics: {
                         sensitivity: 0,
-                        specificity: 0
+                        specificity: 0,
+                        accuracy: []
                     }
                 },
                 3: {
@@ -129,7 +132,8 @@ var app = new Vue({
                     canPredict: true,
                     metrics: {
                         sensitivity: 0,
-                        specificity: 0
+                        specificity: 0,
+                        accuracy: []
                     }
                 }
             },
@@ -139,10 +143,18 @@ var app = new Vue({
                 trainData: 'train/',
                 predictData: 'predict/'
             },
-            mainAccuracyData: {
+            frequencyTemperature: {
+                data: [],
+                layout: {
+                    title: 'Точность "здоров/болен"',
+                    plot_bgcolor: '#F4F4F4',
+                    paper_bgcolor: '#F4F4F4'
+                }
+            },
+            mainAccuracy: {
                 data: [
                     {
-                        values: [1, 0],
+                        values: [],
                         type: 'pie',
                         labels: ['Верно', 'Неверно'],
                         showlegend: false,
@@ -163,6 +175,12 @@ var app = new Vue({
         },
         specificity: function () {
             return typeof this.methods[this.selectedMethod].metrics.specificity != 'undefined' ? this.methods[this.selectedMethod].metrics.specificity : 0;
+        },
+        mainAccuracyData: function () {
+            const values = this.methods[this.selectedMethod].metrics.accuracy.length ? this.methods[this.selectedMethod].metrics.accuracy : [1, 0];
+            const data = [...this.mainAccuracy.data];
+            data[0].values = values;
+            return data;
         }
     },
     created: function () {
@@ -217,12 +235,23 @@ var app = new Vue({
                     },
                     (res) => {
                         if (res.data.status == 'success') {
-                            this.mainAccuracyData.data[0].values = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
+                            this.methods[this.selectedMethod].metrics['accuracy'] = [res.data.metrics.accuracy, 1 - res.data.metrics.accuracy];
                             if (typeof res.data.metrics.sensitivity != undefined) {
                                 this.methods[this.selectedMethod].metrics['sensitivity'] = res.data.metrics.sensitivity;
                             }
                             if (typeof res.data.metrics.specificity != undefined) {
                                 this.methods[this.selectedMethod].metrics['specificity'] = res.data.metrics.specificity;
+                            }
+                            if (typeof res.data.metrics.frequencyTemperature != undefined) {
+                                const freqData = [];
+                                for (let i in res.data.metrics.frequencyTemperature) {
+                                    freqData.push({
+                                        y: Object.values(res.data.metrics.frequencyTemperature[i]), 
+                                        type: 'box',
+                                        name: i
+                                    });
+                                }
+                                this.frequencyTemperature.data = freqData;
                             }
                             this.showToast('Данные успешно получены', 'success');
                         } else if (res.data.status == 'warning') {

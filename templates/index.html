@@ -26,7 +26,15 @@
                 </b-row>
                 <b-row>
                     <b-col cols="6">
-                        <vue-plotly :data="mainAccuracyData.data" :layout="mainAccuracyData.layout" uid="mainAccuracyPie"/>
+                        <vue-plotly :data="mainAccuracyData" :layout="mainAccuracy.layout" uid="mainAccuracyPie"/>
+                    </b-col>
+                    <b-col cols="6">
+
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-col cols="6">
+                        <vue-plotly :data="frequencyTemperature.data" :layout="frequencyTemperature.layout" uid="frequencyTemperatureBox"/>
                     </b-col>
                     <b-col cols="6">
 

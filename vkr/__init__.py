@@ -7,6 +7,7 @@ import os.path
 class Vkr:
     data_dir = 'data/'
     data_file = 'data.cv'
+    data = pd.DataFrame()
 
     methods = {}
 
@@ -19,15 +20,15 @@ class Vkr:
         self.methods = methods
 
     def get_train_test_data(self, test_sizе):
-        data = pd.read_csv(self.data_dir + self.data_file,
+        self.data = pd.read_csv(self.data_dir + self.data_file,
                            delimiter=',',
                            names=['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
                                   '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик', 'target', 'position'])
 
         return train_test_split(
-            data[['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
+            self.data[['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
                   '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик']],
-            data.target,
+            self.data.target,
             test_size=test_sizе,
             random_state=0
         )

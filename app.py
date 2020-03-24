@@ -81,6 +81,7 @@ def predict():
                 'accuracy': accuracy,
                 'sensitivity': VkrInstance.calculate_sensitivity(yPred),
                 'specificity': VkrInstance.calculate_specificity(yPred),
+                'frequencyTemperature': VkrInstance.data[['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм']].to_dict()
             }
     return jsonify(response)
 
