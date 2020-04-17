@@ -66,7 +66,7 @@ Vue.component('recipient-form', {
     },
     computed: {
         patientResultFull: function() {
-            return this.patientResult.class ? this.patientResult.class : '';
+            return this.patientResult ? this.patientResult : '';
         }
     },
     watch: {
@@ -206,6 +206,9 @@ var app = new Vue({
             const data = [...this.mainAccuracy.data];
             data[0].values = values;
             return data;
+        },
+        patientResultFormatted: function () {
+            return this.patientResult.class ? this.patientResult.class + ', в точке ' + this.patientResult.point : '';
         }
     },
     created: function () {
@@ -328,8 +331,9 @@ var app = new Vue({
                 },
                 (res) => {
                     if (res.data.status == 'success') {
-                        this.patientResult.class = res.data.result.class;                     
-                        this.showToast((this.patientResult.class == 1 ? 'Болен' : 'Здоров'), 'success');
+                        this.patientResult.class = res.data.result.class == 1 ? 'Болен' : 'Здоров';
+                        this.patientResult.point = res.data.result.point;
+                        this.showToast('Данные получены', 'success');
                     } else if (res.data.status == 'warning') {
                         this.showToast(res.data.message, 'warning');
                     } else {

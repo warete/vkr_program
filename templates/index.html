@@ -20,7 +20,7 @@
     <b-container fluid>
         <b-row>
             <b-col cols="4">
-                <left-form :methods="methods"></left-form>
+                <left-form :methods="methods" :patient-result="patientResultFormatted"></left-form>
             </b-col>
             <b-col cols="8">
                 <b-row>
@@ -79,7 +79,7 @@
                 <b-button variant="success" @click="onPredictHandler" block>Запустить</b-button>
             </b-col>
         </b-row>
-        <recipient-form></recipient-form>
+        <recipient-form :patient-result="patientResult"/>
     </div>
 </template>
 
@@ -111,7 +111,7 @@
                 <b-button variant="danger" @click="onDiagnoseHandler" block>Диагностировать</b-button>
             </b-col>
             <b-col>
-                <b-input placeholder="Результат" readonly></b-input>
+                <b-input placeholder="Результат" :value="patientResult" readonly></b-input>
             </b-col>
         </b-row>
     </div>

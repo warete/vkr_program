@@ -125,10 +125,21 @@ def diagnose():
             for i in post_data.get('patientData')['rt']:
                 xPredict.append(i)
             yPred = clf.predict([xPredict])
+            from sklearn.model_selection import train_test_split
+            data = VkrInstance.data[VkrInstance.data.position != 10]
+            xTrain, xTest, yTrain, yTest = train_test_split(
+                data[VkrInstance.temp_columns],
+                data.position,
+                test_size=0.25,
+                random_state=0
+            )
             response['status'] = 'success'
             response['result'] = {
-                'class': str(yPred[0])
+                'class': str(yPred[0]),
+                'point': str(SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0])
             }
+
+            response['result']['point'] = str(SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0])
     return jsonify(response)
 
 @app.route('/test/')
