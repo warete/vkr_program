@@ -11,9 +11,9 @@ class TestApi:
         assert result.status_code == 200
 
     def test_static_metrics_route_status_200(self):
-        result = self.client.post('/static_metrics/', data={})
+        result = self.client.post('/static_metrics/', data=json.dumps({}))
         assert result.status_code == 200
-        result = self.client.get('/static_metrics/', data={})
+        result = self.client.get('/static_metrics/', data=json.dumps({}))
         assert result.status_code != 200
 
     def test_train_route_send_not_supported_request_type(self):
