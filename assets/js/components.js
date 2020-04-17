@@ -234,7 +234,7 @@ var app = new Vue({
     mounted: function () {
         this.sendRequest(
             this.apiRoutes.staticMetrics,
-            {},
+            null,
             (res) => {
                 if (res.data.status == 'success') {
                     if (typeof res.data.metrics.frequencyTemperature != undefined) {
