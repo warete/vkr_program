@@ -89,6 +89,7 @@ def predict():
 @app.route('/static_metrics/', methods=['POST'])
 def static_metrics():
     try:
+        post_data = json.loads(request.get_data())
         response = {
             'status': 'success',
             'metrics': {
