@@ -88,13 +88,20 @@ def predict():
 
 @app.route('/static_metrics/', methods=['POST'])
 def static_metrics():
-    response = {
-        'status' : 'success',
-        'metrics': {
-            'frequencyTemperature': VkrInstance.get_temp_freq(),
-            'frequencyTumor': VkrInstance.get_tumor_freq()
+    try:
+        response = {
+            'status': 'success',
+            'metrics': {
+                'frequencyTemperature': VkrInstance.get_temp_freq(),
+                'frequencyTumor': VkrInstance.get_tumor_freq()
+            }
         }
-    }
+    except Exception as e:
+        response = {
+            'status': 'error',
+            'message': e.message
+        }
+
     return jsonify(response)
 
 
