@@ -43,7 +43,7 @@ VkrInstance.set_methods({
 
 @app.route('/')
 def index():
-    return render_template('index.html', debug=app.debug, host=request.host_url)
+    return render_template('index.html', debug=app.debug, host=request.host_url, filepath=app.config['DATA_DIR'] + VkrInstance.data_file)
 
 
 @app.route('/train/', methods=['POST'])
