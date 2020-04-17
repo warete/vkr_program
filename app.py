@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
+import json
 
 from vkr import Vkr
 
@@ -47,7 +48,7 @@ def index():
 
 @app.route('/train/', methods=['POST'])
 def train():
-    post_data = request.get_json()
+    post_data = json.loads(request.get_data())
     response = {
         'status': 'error',
     }
@@ -63,7 +64,7 @@ def train():
 
 @app.route('/predict/', methods=['POST'])
 def predict():
-    post_data = request.get_json()
+    post_data = json.loads(request.get_data())
     response = {
         'status': 'error',
     }
@@ -99,7 +100,7 @@ def static_metrics():
 
 @app.route('/diagnose/', methods=['POST'])
 def diagnose():
-    post_data = request.get_json()
+    post_data = json.loads(request.get_data())
     response = {
         'status': 'error',
     }
