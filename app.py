@@ -121,9 +121,9 @@ def diagnose():
             clf = VkrInstance.get_fitted_model(post_data.get('method'), post_data.get('testPercent'))
             xPredict = []
             for i in post_data.get('patientData')['rt']:
-                xPredict.append(i)
+                xPredict.append(i.replace(',', '.'))
             for i in post_data.get('patientData')['rt']:
-                xPredict.append(i)
+                xPredict.append(i.replace(',', '.'))
             yPred = clf.predict([xPredict])
             from sklearn.model_selection import train_test_split
             data = VkrInstance.data[VkrInstance.data.position != 10]
