@@ -8,6 +8,15 @@ from sklearn.svm import SVC
 from sklearn import neighbors
 from sklearn.ensemble import BaggingClassifier
 from sklearn.linear_model import SGDClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
 from io import StringIO
 
 
@@ -26,10 +35,46 @@ class Vkr:
         self.xTrain, self.xTest, self.yTrain, self.yTest = self.get_train_test_data(
             0.25)
         self.set_methods({
-            'svm': SVC(gamma='scale'),
-            'knn': neighbors.KNeighborsClassifier(5, weights='uniform'),
-            'bagging': BaggingClassifier(SVC(gamma='scale'), max_samples=0.5, max_features=0.5),
-            'sgd': SGDClassifier()
+            'svm': {
+                'name': 'SVC',
+                'clf': SVC(gamma='scale')
+            },
+            'knn': {
+                'name': 'k-ближайших соседей',
+                'clf': neighbors.KNeighborsClassifier(5, weights='uniform')
+            },
+            'bagging': {
+                'name': 'Bagging meta-estimator + SVM',
+                'clf': BaggingClassifier(SVC(gamma='scale'), max_samples=0.5, max_features=0.5)
+            },
+            'sgd': {
+                'name': 'Stochastic Gradient Descent',
+                'clf': SGDClassifier()
+            },
+            'gaussianprocessclassifier': {
+                'name': 'Gaussian Process Classifier',
+                'clf': GaussianProcessClassifier(1.0 * RBF(1.0))
+            },
+            'decisiontreeclassifier': {
+                'name': 'Decision Tree Classifier',
+                'clf': DecisionTreeClassifier(max_depth=5)
+            },
+            'randomforestclassifier': {
+                'name': 'Random Forest Classifier',
+                'clf': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1)
+            },
+            'mlpclassifier': {
+                'name': 'MLP Classifier',
+                'clf': MLPClassifier(alpha=1, max_iter=1000)
+            },
+            'adaboostclassifier': {
+                'name': 'Ada Boost Classifier',
+                'clf': AdaBoostClassifier()
+            },
+            'quadraticdiscriminantanalysis': {
+                'name': 'Quadratic Discriminant Analysis',
+                'clf': QuadraticDiscriminantAnalysis()
+            }
         })
 
     def set_data_dir(self, dir):
@@ -63,14 +108,14 @@ class Vkr:
     def get_fitted_model(self, name, test_percent=25, need_fit=False):
         if self.need_fit_model(name, test_percent) or need_fit:
             self.xTrain, self.xTest, self.yTrain, self.yTest = self.get_train_test_data(test_percent / 100)
-            self.methods[name] = self.methods[name].fit(self.xTrain, self.yTrain)
+            self.methods[name]['clf'] = self.methods[name]['clf'].fit(self.xTrain, self.yTrain)
             with open(self.get_pickled_file_name(name + '_' + str(test_percent)), 'wb') as f:
-                pickle.dump(self.methods[name], f)
+                pickle.dump(self.methods[name]['clf'], f)
         else:
             with open(self.get_pickled_file_name(name + '_' + str(test_percent)), 'rb') as f:
-                self.methods[name] = pickle.load(f)
+                self.methods[name]['clf'] = pickle.load(f)
 
-        return self.methods[name]
+        return self.methods[name]['clf']
 
     def calculate_sensitivity(self, yPred):
         sick_test_cnt = len(self.yTest[self.yTest == 1])
@@ -110,9 +155,10 @@ class Vkr:
         )
 
         diagnose_class = yPred[0]
-        predicted_point = SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0]
 
-        return diagnose_class, predicted_point
+        predicted_points = MLPClassifier(alpha=1, max_iter=1000).fit(xTrain, yTrain).predict(xTest)
+
+        return diagnose_class, predicted_points[0], accuracy_score(yTest, predicted_points)
 
     def check_or_copy_data_file(self):
         if not os.path.isfile(self.data_dir + self.data_file):

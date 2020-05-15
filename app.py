@@ -91,6 +91,30 @@ def static_metrics():
     return jsonify(response)
 
 
+@app.route('/methods/', methods=['POST'])
+def methods():
+    formatted_methods = {}
+    i = 0
+    for key in VkrInstance.methods:
+        formatted_methods[i] = {
+            'name': VkrInstance.methods[key]['name'],
+            'code': key,
+            'canPredict': True,
+            'metrics': {
+                'sensitivity': 0,
+                'specificity': 0,
+                'accuracy': []
+            }
+        }
+        i += 1
+    response = {
+        'status': 'success',
+        'methods': formatted_methods
+    }
+
+    return jsonify(response)
+
+
 @app.route('/diagnose/', methods=['POST'])
 def diagnose():
     post_data = json.loads(request.get_data())
@@ -103,14 +127,15 @@ def diagnose():
             response['status'] = 'warning'
             response['message'] = 'Нужно сначала обучить'
         else:
-            diagnose_class, predicted_point = VkrInstance.get_diagnose(post_data.get('method'),
+            diagnose_class, predicted_point, accuracy = VkrInstance.get_diagnose(post_data.get('method'),
                                                                        post_data.get('testPercent'),
                                                                        post_data.get('patientData'))
 
             response['status'] = 'success'
             response['result'] = {
                 'class': str(diagnose_class),
-                'point': str(predicted_point)
+                'point': str(predicted_point),
+                'accuracy': accuracy
             }
 
     return jsonify(response)

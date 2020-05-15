@@ -177,6 +177,7 @@ var app = new Vue({
                 predictData: 'predict/',
                 staticMetrics: 'static_metrics/',
                 diagnose: 'diagnose/',
+                methods: 'methods/',
             },
             frequencyTemperature: {
                 data: [],
@@ -260,6 +261,7 @@ var app = new Vue({
         });
     },
     mounted: function () {
+        this.getMethods();
         this.getStaticMetrics();
     },
     methods: {
@@ -340,35 +342,50 @@ var app = new Vue({
         },
         getStaticMetrics: function() {
             this.sendRequest(
-            this.apiRoutes.staticMetrics,
-            {},
-            (res) => {
-                if (res.data.status == 'success') {
-                    if (typeof res.data.metrics.frequencyTemperature != undefined) {
-                        const freqData = [];
-                        for (let i in res.data.metrics.frequencyTemperature) {
-                            freqData.push({
-                                y: Object.values(res.data.metrics.frequencyTemperature[i]),
-                                type: 'box',
-                                name: i,
-                                automargin: true
-                            });
+                this.apiRoutes.staticMetrics,
+                {},
+                (res) => {
+                    if (res.data.status == 'success') {
+                        if (typeof res.data.metrics.frequencyTemperature != undefined) {
+                            const freqData = [];
+                            for (let i in res.data.metrics.frequencyTemperature) {
+                                freqData.push({
+                                    y: Object.values(res.data.metrics.frequencyTemperature[i]),
+                                    type: 'box',
+                                    name: i,
+                                    automargin: true
+                                });
+                            }
+                            this.frequencyTemperature.data = freqData;
                         }
-                        this.frequencyTemperature.data = freqData;
+                        if (typeof res.data.metrics.frequencyTumor != undefined) {
+                            this.frequencyTumor.data = [{
+                                x: Object.values(res.data.metrics.frequencyTumor.x),
+                                y: Object.values(res.data.metrics.frequencyTumor.y),
+                                type: 'bar',
+                                automargin: true
+                            }];
+                        }
+                    } else {
+                        this.showToast('Произошла ошибка во время получения статистических данных', 'error');
                     }
-                    if (typeof res.data.metrics.frequencyTumor != undefined) {
-                        this.frequencyTumor.data = [{
-                            x: Object.values(res.data.metrics.frequencyTumor.x),
-                            y: Object.values(res.data.metrics.frequencyTumor.y),
-                            type: 'bar',
-                            automargin: true
-                        }];
-                    }
-                } else {
-                    this.showToast('Произошла ошибка во время получения статистических данных', 'error');
                 }
-            }
-        );
+            );
+        },
+        getMethods: function() {
+            this.sendRequest(
+                this.apiRoutes.methods,
+                {},
+                (res) => {
+                    if (res.data.status == 'success') {
+                        if (typeof res.data.methods != undefined) {
+                            this.methods = res.data.methods;
+                        }
+                    } else {
+                        this.showToast('Произошла ошибка во время получения статистических данных', 'error');
+                    }
+                }
+            );
         },
         showToast: function (message, type) {
             const types = {
