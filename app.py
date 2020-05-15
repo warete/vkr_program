@@ -145,19 +145,5 @@ def upload_data():
         })
 
 
-@app.route('/test/', methods=['GET', 'POST'])
-def test():
-    return """
-        <!doctype html>
-        <title>Upload new File</title>
-        <h1>Upload new File</h1>
-        <form action="/upload_data/" method=post enctype=multipart/form-data>
-          <p><input type=file name=file>
-             <input type=submit value=Upload>
-        </form>
-        <p>%s</p>
-        """ % "<br>".join(os.listdir(app.config['DATA_DIR'], ))
-
-
 if __name__ == '__main__':
     app.run(debug=app.debug)
