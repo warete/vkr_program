@@ -6,6 +6,7 @@ from sklearn.svm import SVC
 from sklearn import neighbors
 from sklearn.ensemble import BaggingClassifier
 from sklearn.linear_model import SGDClassifier
+from io import StringIO
 
 
 class Vkr:
@@ -36,10 +37,12 @@ class Vkr:
         self.methods = methods
 
     def get_train_test_data(self, test_sizе):
-        self.data = pd.read_csv(self.data_dir + self.data_file,
-                           delimiter=',',
-                           names=['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
-                                  '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик', 'target', 'position'])
+        with open(self.data_dir + self.data_file, "r") as f:
+            self.data = pd.read_csv(StringIO(f.read()),
+                               delimiter=',',
+                               names=['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
+                                      '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик', 'target', 'position'])
+            f.close()
 
         return train_test_split(
             self.data[self.temp_columns],

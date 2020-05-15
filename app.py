@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import json
 import os
+import shutil
 from sklearn.metrics import accuracy_score
 
 from vkr import Vkr
@@ -118,9 +119,17 @@ def diagnose():
 def upload_data():
     file = request.files['file']
     if file and allowed_file(file.filename):
-        file_path = os.path.join(app.config['DATA_DIR'], '_' + VkrInstance.data_file)
-        os.rename(app.config['DATA_DIR'], VkrInstance.data_file, app.config['DATA_DIR'], 'old_' + VkrInstance.data_file)
+        file_path = os.path.join(app.config['DATA_DIR'], VkrInstance.data_file)
+        # бэкап старого файла
+        shutil.copyfile(os.path.join(app.config['DATA_DIR'], VkrInstance.data_file),
+                  os.path.join(app.config['DATA_DIR'], 'old_' + VkrInstance.data_file))
         file.save(file_path)
+
+        # Удаляем старые pickle-файлы
+        clear_pickle_files(app.config['DATA_DIR'])
+        # Перечитаем файл с данными
+        # VkrInstance.init()
+        print("lol")
         return jsonify({
             'status': 'success',
             'result': {
