@@ -1,3 +1,5 @@
+import shutil
+
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import pickle
@@ -14,7 +16,7 @@ class Vkr:
     data_file = 'data.cv'
     data = pd.DataFrame()
     temp_columns = ['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
-                  '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик']
+                    '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик']
 
     methods = {}
 
@@ -39,9 +41,10 @@ class Vkr:
     def get_train_test_data(self, test_sizе):
         with open(self.data_dir + self.data_file, "r") as f:
             self.data = pd.read_csv(StringIO(f.read()),
-                               delimiter=',',
-                               names=['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
-                                      '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик', 'target', 'position'])
+                                    delimiter=',',
+                                    names=['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм',
+                                           '0ик', '1ик', '2ик', '3ик', '4ик', '5ик', '6ик', '7ик', '8ик', 'target',
+                                           'position'])
             f.close()
 
         return train_test_split(
@@ -85,7 +88,7 @@ class Vkr:
     def get_tumor_freq(self):
         withoutLast = self.data[self.data['position'] != 10]
         return {
-            'x': ['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм'], 
+            'x': ['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм'],
             'y': withoutLast[withoutLast['target'] == 1]['position'].value_counts().to_dict()
         }
 
@@ -110,3 +113,8 @@ class Vkr:
         predicted_point = SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0]
 
         return diagnose_class, predicted_point
+
+    def check_or_copy_data_file(self):
+        if not os.path.isfile(self.data_dir + self.data_file):
+            shutil.copyfile(os.path.join('assets/data.csv'),
+                            os.path.join(self.data_dir, self.data_file))

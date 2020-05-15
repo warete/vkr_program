@@ -21,6 +21,7 @@ CORS(app)
 VkrInstance = Vkr()
 VkrInstance.set_data_dir(dir=app.config['DATA_DIR'])
 VkrInstance.data_file = 'data.csv'
+VkrInstance.check_or_copy_data_file()
 VkrInstance.init()
 
 
