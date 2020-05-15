@@ -2,11 +2,10 @@ from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import json
 import os
-
-from vkr import Vkr
 from sklearn.metrics import accuracy_score
 
-from utils import CustomFlask
+from vkr import Vkr
+from utils import CustomFlask, allowed_file, clear_pickle_files
 
 # instantiate the app
 app = CustomFlask(__name__, static_folder="assets")
@@ -102,28 +101,16 @@ def diagnose():
             response['status'] = 'warning'
             response['message'] = 'Нужно сначала обучить'
         else:
-            clf = VkrInstance.get_fitted_model(post_data.get('method'), post_data.get('testPercent'))
-            xPredict = []
-            for i in post_data.get('patientData')['rt']:
-                xPredict.append(i.replace(',', '.'))
-            for i in post_data.get('patientData')['rt']:
-                xPredict.append(i.replace(',', '.'))
-            yPred = clf.predict([xPredict])
-            from sklearn.model_selection import train_test_split
-            data = VkrInstance.data[VkrInstance.data.position != 10]
-            xTrain, xTest, yTrain, yTest = train_test_split(
-                data[VkrInstance.temp_columns],
-                data.position,
-                test_size=0.25,
-                random_state=0
-            )
+            diagnose_class, predicted_point = VkrInstance.get_diagnose(post_data.get('method'),
+                                                                       post_data.get('testPercent'),
+                                                                       post_data.get('patientData'))
+
             response['status'] = 'success'
             response['result'] = {
-                'class': str(yPred[0]),
-                'point': str(SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0])
+                'class': str(diagnose_class),
+                'point': str(predicted_point)
             }
 
-            response['result']['point'] = str(SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0])
     return jsonify(response)
 
 

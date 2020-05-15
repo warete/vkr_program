@@ -85,3 +85,25 @@ class Vkr:
             'x': ['0ртм', '1ртм', '2ртм', '3ртм', '4ртм', '5ртм', '6ртм', '7ртм', '8ртм'], 
             'y': withoutLast[withoutLast['target'] == 1]['position'].value_counts().to_dict()
         }
+
+    def get_diagnose(self, method, test_percent, patient_data):
+        clf = self.get_fitted_model(method, test_percent)
+        xPredict = []
+        for i in patient_data['rt']:
+            xPredict.append(i.replace(',', '.'))
+        for i in patient_data['rt']:
+            xPredict.append(i.replace(',', '.'))
+        yPred = clf.predict([xPredict])
+        from sklearn.model_selection import train_test_split
+        data = self.data[self.data.position != 10]
+        xTrain, xTest, yTrain, yTest = train_test_split(
+            data[self.temp_columns],
+            data.position,
+            test_size=0.25,
+            random_state=0
+        )
+
+        diagnose_class = yPred[0]
+        predicted_point = SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0]
+
+        return diagnose_class, predicted_point
