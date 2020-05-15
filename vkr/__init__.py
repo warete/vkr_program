@@ -2,6 +2,10 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import pickle
 import os.path
+from sklearn.svm import SVC
+from sklearn import neighbors
+from sklearn.ensemble import BaggingClassifier
+from sklearn.linear_model import SGDClassifier
 
 
 class Vkr:
@@ -14,6 +18,16 @@ class Vkr:
     methods = {}
 
     xTrain, yTrain, xTest, yTest = [], [], [], []
+
+    def init(self):
+        self.xTrain, self.xTest, self.yTrain, self.yTest = self.get_train_test_data(
+            0.25)
+        self.set_methods({
+            'svm': SVC(gamma='scale'),
+            'knn': neighbors.KNeighborsClassifier(5, weights='uniform'),
+            'bagging': BaggingClassifier(SVC(gamma='scale'), max_samples=0.5, max_features=0.5),
+            'sgd': SGDClassifier()
+        })
 
     def set_data_dir(self, dir):
         self.data_dir = dir

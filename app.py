@@ -1,23 +1,12 @@
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import json
+import os
 
 from vkr import Vkr
-
-from sklearn.svm import SVC
-from sklearn import neighbors
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import BaggingClassifier
-from sklearn.linear_model import SGDClassifier
 
-
-class CustomFlask(Flask):
-    jinja_options = Flask.jinja_options.copy()
-    jinja_options.update(dict(
-        variable_start_string='%%',  # Default is '{{', I'm changing this because Vue.js uses '{{' / '}}'
-        variable_end_string='%%',
-    ))
-
+from utils import CustomFlask
 
 # instantiate the app
 app = CustomFlask(__name__, static_folder="assets")
@@ -32,18 +21,13 @@ CORS(app)
 VkrInstance = Vkr()
 VkrInstance.set_data_dir(dir=app.config['DATA_DIR'])
 VkrInstance.data_file = 'data.csv'
-VkrInstance.xTrain, VkrInstance.xTest, VkrInstance.yTrain, VkrInstance.yTest = VkrInstance.get_train_test_data(0.25)
-VkrInstance.set_methods({
-    'svm': SVC(gamma='scale'),
-    'knn': neighbors.KNeighborsClassifier(5, weights='uniform'),
-    'bagging': BaggingClassifier(SVC(gamma='scale'), max_samples=0.5, max_features=0.5),
-    'sgd': SGDClassifier()
-})
+VkrInstance.init()
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', debug=app.debug, host=request.host_url, filepath=app.config['DATA_DIR'] + VkrInstance.data_file)
+    return render_template('index.html', debug=app.debug, host=request.host_url,
+                           filepath=app.config['DATA_DIR'] + VkrInstance.data_file)
 
 
 @app.route('/train/', methods=['POST'])
@@ -142,21 +126,41 @@ def diagnose():
             response['result']['point'] = str(SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)[0])
     return jsonify(response)
 
-@app.route('/test/')
+
+@app.route('/upload_data/', methods=['POST'])
+def upload_data():
+    file = request.files['file']
+    if file and allowed_file(file.filename):
+        file_path = os.path.join(app.config['DATA_DIR'], '_' + VkrInstance.data_file)
+        os.rename(app.config['DATA_DIR'], VkrInstance.data_file, app.config['DATA_DIR'], 'old_' + VkrInstance.data_file)
+        file.save(file_path)
+        return jsonify({
+            'status': 'success',
+            'result': {
+                'file_path': file_path
+            }
+        })
+    else:
+        return jsonify({
+            'status': 'error',
+            'result': {
+                'message': 'Неподходящий тип файла'
+            }
+        })
+
+
+@app.route('/test/', methods=['GET', 'POST'])
 def test():
-    from sklearn.model_selection import train_test_split
-    from sklearn.model_selection import GridSearchCV
-    data = VkrInstance.data[VkrInstance.data.position != 10]
-    xTrain, xTest, yTrain, yTest = train_test_split(
-            data[VkrInstance.temp_columns],
-            data.position,
-            test_size=0.25,
-            random_state=0
-        )
-    yPred = SVC(gamma='scale').fit(xTrain, yTrain).predict(xTest)
-    print(yPred)
-    print(accuracy_score(yTest, yPred))
-    return ''
+    return """
+        <!doctype html>
+        <title>Upload new File</title>
+        <h1>Upload new File</h1>
+        <form action="/upload_data/" method=post enctype=multipart/form-data>
+          <p><input type=file name=file>
+             <input type=submit value=Upload>
+        </form>
+        <p>%s</p>
+        """ % "<br>".join(os.listdir(app.config['DATA_DIR'], ))
 
 
 if __name__ == '__main__':
