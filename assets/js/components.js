@@ -26,7 +26,7 @@ Vue.component('left-form', {
             importFilePath: '',
             testPercent: 25,
             selectedMethod: 0,
-            datafile: ''
+            datafile: null
         }
     },
     computed: {
