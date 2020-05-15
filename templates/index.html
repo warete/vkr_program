@@ -53,10 +53,16 @@
         <b-row>
             <b-col cols="12"><label>Файл с данными</label></b-col>
             <b-col>
-                <b-input value="%% filepath %%" readonly></b-input>
+                <b-form-file
+                        v-model="datafile"
+                        placeholder="Выберите csv-файл..."
+                        drop-placeholder="Перетащите csv-файл сюда..."
+                        browse-text="Выбрать"
+                        ref="datafile"
+                ></b-form-file>
             </b-col>
             <b-col>
-                <b-button disabled block>Выбрать csv-файл</b-button>
+                <b-button block @click="submitFile">Загрузить</b-button>
             </b-col>
         </b-row>
         <b-row>

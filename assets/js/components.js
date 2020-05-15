@@ -25,7 +25,8 @@ Vue.component('left-form', {
         return {
             importFilePath: '',
             testPercent: 25,
-            selectedMethod: 0
+            selectedMethod: 0,
+            datafile: ''
         }
     },
     computed: {
@@ -52,6 +53,27 @@ Vue.component('left-form', {
         },
         onPredictHandler: function() {
             this.$root.$emit('do_predict');
+        },
+        submitFile: function () {
+            const formData = new FormData();
+            formData.append('file', this.datafile);
+
+            const self = this;
+            axios.post('/upload_data/',
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            )
+                .then(function () {
+                    self.$root.$emit('show_toast', 'Файл успешно загружен', 'success');
+                    self.$root.$emit('get_metrics');
+                })
+                .catch(function () {
+                    self.$root.$emit('show_toast', 'Не удалось загрузить файл', 'error');
+                });
         }
     }
 });
@@ -233,38 +255,12 @@ var app = new Vue({
         this.$on('show_toast', function (message, type) {
             this.showToast(message, type);
         });
+        this.$on('get_metrics', function () {
+            this.getStaticMetrics();
+        });
     },
     mounted: function () {
-        this.sendRequest(
-            this.apiRoutes.staticMetrics,
-            {},
-            (res) => {
-                if (res.data.status == 'success') {
-                    if (typeof res.data.metrics.frequencyTemperature != undefined) {
-                        const freqData = [];
-                        for (let i in res.data.metrics.frequencyTemperature) {
-                            freqData.push({
-                                y: Object.values(res.data.metrics.frequencyTemperature[i]), 
-                                type: 'box',
-                                name: i,
-                                automargin: true
-                            });
-                        }
-                        this.frequencyTemperature.data = freqData;
-                    }
-                    if (typeof res.data.metrics.frequencyTumor != undefined) {                        
-                        this.frequencyTumor.data = [{
-                            x: Object.values(res.data.metrics.frequencyTumor.x), 
-                            y: Object.values(res.data.metrics.frequencyTumor.y),
-                            type: 'bar',
-                            automargin: true
-                        }];
-                    }
-                } else {
-                    this.showToast('Произошла ошибка во время получения статистических данных', 'error');
-                }
-            }
-        );
+        this.getStaticMetrics();
     },
     methods: {
         sendRequest: function(endPoint, payload, callback) {
@@ -341,6 +337,38 @@ var app = new Vue({
                     }
                 }
             );
+        },
+        getStaticMetrics: function() {
+            this.sendRequest(
+            this.apiRoutes.staticMetrics,
+            {},
+            (res) => {
+                if (res.data.status == 'success') {
+                    if (typeof res.data.metrics.frequencyTemperature != undefined) {
+                        const freqData = [];
+                        for (let i in res.data.metrics.frequencyTemperature) {
+                            freqData.push({
+                                y: Object.values(res.data.metrics.frequencyTemperature[i]),
+                                type: 'box',
+                                name: i,
+                                automargin: true
+                            });
+                        }
+                        this.frequencyTemperature.data = freqData;
+                    }
+                    if (typeof res.data.metrics.frequencyTumor != undefined) {
+                        this.frequencyTumor.data = [{
+                            x: Object.values(res.data.metrics.frequencyTumor.x),
+                            y: Object.values(res.data.metrics.frequencyTumor.y),
+                            type: 'bar',
+                            automargin: true
+                        }];
+                    }
+                } else {
+                    this.showToast('Произошла ошибка во время получения статистических данных', 'error');
+                }
+            }
+        );
         },
         showToast: function (message, type) {
             const types = {
