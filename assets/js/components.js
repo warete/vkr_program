@@ -211,9 +211,26 @@ var app = new Vue({
                     paper_bgcolor: '#F4F4F4'
                 }
             },
+            diagnoseAccuracy: {
+                data: [
+                    {
+                        values: [],
+                        type: 'pie',
+                        labels: ['Верно', 'Неверно'],
+                        showlegend: false,
+                        automargin: true
+                    }
+                ],
+                layout: {
+                    title: 'Точность локализации',
+                    plot_bgcolor: '#F4F4F4',
+                    paper_bgcolor: '#F4F4F4'
+                }
+            },
             patientResult: {
                 class: null,
-                point: null
+                point: null,
+                accuracy: []
             }
         }
     },
@@ -227,6 +244,12 @@ var app = new Vue({
         mainAccuracyData: function () {
             const values = this.methods[this.selectedMethod].metrics.accuracy.length ? this.methods[this.selectedMethod].metrics.accuracy : [1, 0];
             const data = [...this.mainAccuracy.data];
+            data[0].values = values;
+            return data;
+        },
+        diagnoseAccuracyData: function () {
+            const values = this.patientResult.accuracy.length ? this.patientResult.accuracy : [1, 0];
+            const data = [...this.diagnoseAccuracy.data];
             data[0].values = values;
             return data;
         },
@@ -331,6 +354,7 @@ var app = new Vue({
                     if (res.data.status == 'success') {
                         this.patientResult.class = res.data.result.class == 1 ? 'Болен' : 'Здоров';
                         this.patientResult.point = res.data.result.point;
+                        this.patientResult.accuracy = [res.data.result.accuracy, 1 - res.data.result.accuracy];
                         this.showToast('Данные получены', 'success');
                     } else if (res.data.status == 'warning') {
                         this.showToast(res.data.message, 'warning');
