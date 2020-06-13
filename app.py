@@ -65,8 +65,8 @@ def predict():
             response['status'] = 'success'
             response['metrics'] = {
                 'accuracy': accuracy,
-                'sensitivity': VkrInstance.calculate_sensitivity(yPred),
-                'specificity': VkrInstance.calculate_specificity(yPred)
+                'sensitivity': VkrInstance.calculate_sensitivity(yPred) * 100,
+                'specificity': VkrInstance.calculate_specificity(yPred) * 100
             }
     return jsonify(response)
 

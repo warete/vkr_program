@@ -24,8 +24,8 @@
             </b-col>
             <b-col cols="8">
                 <b-row>
-                    <b-col cols="6">Чувствительность: {{ sensitivity }}</b-col>
-                    <b-col cols="6">Специфичность: {{ specificity }}</b-col>
+                    <b-col cols="6">Чувствительность: {{ sensitivity | toFixed }}%</b-col>
+                    <b-col cols="6">Специфичность: {{ specificity | toFixed }}%</b-col>
                 </b-row>
                 <b-row>
                     <b-col cols="6">

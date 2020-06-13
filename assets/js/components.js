@@ -122,6 +122,10 @@ Vue.component('recipient-form', {
     }
 });
 
+Vue.filter('toFixed', function (value) {
+  return value.toFixed(1);
+});
+
 var app = new Vue({
     el: '#app',
     data: function() {
