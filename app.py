@@ -55,7 +55,7 @@ def predict():
     }
 
     if post_data.get('method') in VkrInstance.methods:
-        if VkrInstance.need_fit_model(post_data.get('method')):
+        if VkrInstance.need_fit_model(post_data.get('method'), post_data.get('testPercent')):
             response['status'] = 'warning'
             response['message'] = 'Нужно сначала обучить'
         else:
